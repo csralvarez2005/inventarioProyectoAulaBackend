@@ -1,27 +1,36 @@
 package inventarioEquiposBackend.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Entity
-@Table(name = "areas")
+@Document(collection = "areas")
 public class Area {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Indexed(unique = true)
     private String nombre;
+
     private String tipo;
 
-    @OneToOne
-    @JoinColumn(name = "funcionario_id", referencedColumnName = "id")
-    private Funcionario funcionario;
+    // Constructores
+    public Area() {
+    }
 
+    public Area(Long areaId, String nombre, String tipo) {
+        this.id = areaId;
+        this.nombre = nombre;
+        this.tipo = tipo;
+    }
+
+    // Getters y Setters
     public Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setId(Long Id) {
+        this.id = Id;
     }
 
     public String getNombre() {
@@ -40,11 +49,12 @@ public class Area {
         this.tipo = tipo;
     }
 
-    public Funcionario getFuncionario() {
-        return funcionario;
-    }
-
-    public void setFuncionario(Funcionario funcionario) {
-        this.funcionario = funcionario;
+    @Override
+    public String toString() {
+        return "Area{" +
+                "Id=" + id +
+                ", nombre='" + nombre + '\'' +
+                ", tipo='" + tipo + '\'' +
+                '}';
     }
 }
