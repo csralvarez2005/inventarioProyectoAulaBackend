@@ -4,16 +4,25 @@ import inventarioEquiposBackend.dto.FuncionarioDTO;
 import inventarioEquiposBackend.exception.DuplicateResourceException;
 import inventarioEquiposBackend.exception.ResourceNotFoundException;
 import inventarioEquiposBackend.model.Funcionario;
+
 import inventarioEquiposBackend.repository.FuncionarioRepository;
 import inventarioEquiposBackend.service.FuncionarioService;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+
 import java.util.List;
+
+
 @Service
 public class FuncionarioServiceImpl implements FuncionarioService {
     @Autowired
     private FuncionarioRepository repository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public Funcionario create(FuncionarioDTO dto) {
@@ -22,7 +31,8 @@ public class FuncionarioServiceImpl implements FuncionarioService {
         }
 
         Funcionario f = mapToEntity(dto);
-        f.setEstado("activo"); // establecer estado por defecto
+        f.setEstado("activo");
+        f.setPassword(passwordEncoder.encode(dto.getPassword()));
         return repository.save(f);
     }
 
@@ -46,6 +56,7 @@ public class FuncionarioServiceImpl implements FuncionarioService {
         }
         f = mapToEntity(dto);
         f.setId(id);
+        f.setPassword(passwordEncoder.encode(dto.getPassword()));
         return repository.save(f);
     }
 
@@ -69,6 +80,7 @@ public class FuncionarioServiceImpl implements FuncionarioService {
         f.setGenero(dto.getGenero());
         f.setIdentificacion(dto.getIdentificacion());
         f.setNombre_funcionario(dto.getNombre_funcionario());
+
         return f;
     }
 }
