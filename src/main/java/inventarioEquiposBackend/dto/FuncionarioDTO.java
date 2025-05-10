@@ -7,26 +7,26 @@ import jakarta.validation.constraints.Pattern;
 import java.util.Date;
 
 public class FuncionarioDTO {
-    @NotBlank
+    @NotBlank(message = "El tipo de documento es obligatorio")
     private String tipo_documento;
 
-    @NotBlank
+    @NotBlank(message = "El apellido es obligatorio")
     private String apellido_funcionario;
 
-    @NotBlank
+    @NotBlank(message = "El cargo es obligatorio")
     private String cargo;
 
-    @NotBlank
+    @NotBlank(message = "El celular es obligatorio")
     private String celular;
 
-    @NotBlank
+    @NotBlank(message = "La dirección es obligatoria")
     private String direccion;
 
-    @Email
-    @NotBlank
+    @Email(message = "Debe ser un email válido")
+    @NotBlank(message = "El email es obligatorio")
     private String email;
 
-    private String estado = "activo"; // opcional con valor por defecto
+    private String estado = "activo"; // Valor por defecto
 
     private String estado_civil;
 
@@ -34,24 +34,27 @@ public class FuncionarioDTO {
 
     private String genero;
 
-    @NotBlank
+    @NotBlank(message = "La identificación es obligatoria")
     private String identificacion;
 
-    @NotBlank
+    @NotBlank(message = "El nombre es obligatorio")
     private String nombre_funcionario;
 
-    @NotBlank
+    @NotBlank(message = "La contraseña es obligatoria")
     private String password;
 
     @NotBlank(message = "El rol es obligatorio (ADMIN o USER)")
-    @Pattern(regexp = "ADMIN|USER", flags = Pattern.Flag.CASE_INSENSITIVE,
-            message = "El rol debe ser ADMIN o USER")
+    @Pattern(
+            regexp = "ADMIN|USER",
+            flags = Pattern.Flag.CASE_INSENSITIVE,
+            message = "El rol debe ser ADMIN o USER"
+    )
     private String rol;
+    // Nuevo atributo para almacenar la URL de la imagen
+    private String imagen_url;
 
     // Getters y Setters
-    // ...
 
-    // Métodos generados (puedes usar Lombok si prefieres)
     public String getTipo_documento() {
         return tipo_documento;
     }
@@ -162,5 +165,13 @@ public class FuncionarioDTO {
 
     public void setRol(String rol) {
         this.rol = rol;
+    }
+
+    public String getImagen_url() {
+        return imagen_url;
+    }
+
+    public void setImagen_url(String imagen_url) {
+        this.imagen_url = imagen_url;
     }
 }

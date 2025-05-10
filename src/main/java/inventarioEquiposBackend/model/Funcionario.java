@@ -40,9 +40,19 @@ public class Funcionario implements UserDetails{
     private String password;
 
     @Enumerated(EnumType.STRING)
-    private Rol rol; // Ejemplo: "ADMIN", "USER"
+    private Rol rol;
+    // Nuevo campo para la URL de la imagen
+    private String imagen_url;
 
     // Getters y Setters
+
+    public String getImagen_url() {
+        return imagen_url;
+    }
+
+    public void setImagen_url(String imagen_url) {
+        this.imagen_url = imagen_url;
+    }
 
     public Long getId() { return id; }
 

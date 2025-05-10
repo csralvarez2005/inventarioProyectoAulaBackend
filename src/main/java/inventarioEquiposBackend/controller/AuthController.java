@@ -1,44 +1,52 @@
 package inventarioEquiposBackend.controller;
 
+import inventarioEquiposBackend.config.JwtResponse;
+import inventarioEquiposBackend.config.JwtTokenUtil;
+import inventarioEquiposBackend.config.MessageResponse;
 import inventarioEquiposBackend.dto.LoginRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         try {
+            // Authenticate
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            request.getIdentificacion(), request.getPassword()
+                            loginRequest.getIdentificacion(),
+                            loginRequest.getPassword()
                     )
             );
 
-            // Aquí podrías generar y retornar un token JWT si lo estás usando
-            return ResponseEntity.ok("Login exitoso para: " + request.getIdentificacion());
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        } catch (BadCredentialsException ex) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales inválidas");
-        } catch (DisabledException ex) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario deshabilitado");
-        } catch (LockedException ex) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Cuenta bloqueada");
-        } catch (AuthenticationException ex) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Error de autenticación");
+            // Generate JWT token
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            String token = jwtTokenUtil.generateToken(userDetails);
+
+            // Return token in response
+            return ResponseEntity.ok(new JwtResponse(token));
+
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new MessageResponse("Invalid credentials"));
         }
     }
 }
