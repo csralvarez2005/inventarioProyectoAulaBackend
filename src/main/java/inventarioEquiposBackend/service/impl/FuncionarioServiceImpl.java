@@ -19,6 +19,7 @@ import java.util.List;
 
 @Service
 public class FuncionarioServiceImpl implements FuncionarioService {
+
     @Autowired
     private FuncionarioRepository repository;
 
@@ -34,7 +35,6 @@ public class FuncionarioServiceImpl implements FuncionarioService {
         Funcionario f = mapToEntity(dto);
         f.setEstado("activo");
 
-        // Asegurarse de que la contraseña no sea null antes de codificarla
         if (dto.getPassword() != null && !dto.getPassword().isEmpty()) {
             f.setPassword(passwordEncoder.encode(dto.getPassword()));
         } else {
@@ -64,7 +64,6 @@ public class FuncionarioServiceImpl implements FuncionarioService {
             throw new DuplicateResourceException("Identificación ya registrada");
         }
 
-        // Mantener la contraseña actual si no se proporciona una nueva
         String password = f.getPassword();
         if (dto.getPassword() != null && !dto.getPassword().isEmpty()) {
             password = passwordEncoder.encode(dto.getPassword());
@@ -74,7 +73,6 @@ public class FuncionarioServiceImpl implements FuncionarioService {
         updated.setId(id);
         updated.setPassword(password);
 
-        // Mantener el estado actual si no se proporciona uno nuevo
         if (dto.getEstado() == null || dto.getEstado().isEmpty()) {
             updated.setEstado(f.getEstado());
         }
@@ -99,13 +97,19 @@ public class FuncionarioServiceImpl implements FuncionarioService {
         return repository.existsByIdentificacion(identificacion);
     }
 
-    // Nuevo método para actualizar solo la imagen del funcionario
+    /**
+     * Actualiza la URL de la imagen del funcionario.
+     */
+    @Override
     public Funcionario updateImagen(Long id, String imagenUrl) {
         Funcionario funcionario = getById(id);
         funcionario.setImagen_url(imagenUrl);
         return repository.save(funcionario);
     }
 
+    /**
+     * Convierte un DTO en una entidad Funcionario.
+     */
     private Funcionario mapToEntity(FuncionarioDTO dto) {
         Funcionario f = new Funcionario();
         f.setTipo_documento(dto.getTipo_documento());
@@ -120,20 +124,15 @@ public class FuncionarioServiceImpl implements FuncionarioService {
         f.setGenero(dto.getGenero());
         f.setIdentificacion(dto.getIdentificacion());
         f.setNombre_funcionario(dto.getNombre_funcionario());
-
-        // Añadir la URL de la imagen
         f.setImagen_url(dto.getImagen_url());
 
-        // Conversión segura de String a Enum con manejo de errores
         try {
             if (dto.getRol() != null) {
                 f.setRol(Rol.valueOf(dto.getRol().toUpperCase()));
             } else {
-                // Establecer un rol por defecto si es null
                 f.setRol(Rol.USER);
             }
         } catch (IllegalArgumentException e) {
-            // Si el valor no coincide con ningún valor del enum, establecer un valor por defecto
             f.setRol(Rol.USER);
         }
 
